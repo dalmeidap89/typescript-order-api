@@ -1,0 +1,12 @@
+{
+  "name": "node-boilerplate",
+  "version": "1.0.0",
+  "description": "Boilerplate as base for microservice",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Danny Almeida",
+  "license": "ISC"
+}
