@@ -10,8 +10,10 @@
     //CommonJs style module in output
     "outDir": "dist",
     //change the output directory
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
     //to import out json database
+    "esModuleInterop": true,
+    "noImplicitAny": true
   },
   "include": [
     "src/**/*.ts"

@@ -4,7 +4,13 @@
   "description": "Boilerplate as base for microservice",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "ts-node-dev --respawn --transpileOnly src/index.ts",
+    "dev:debug": "ts-node-dev --inspect=4321 --respawn --transpileOnly src/index.ts",
+    "prod": "tsc && node ./dist/server.js",
+    "start": "npx pm2 start pm2.yaml",
+    "test": "jest --coverage --verbose",
+    "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
+    "postinstall": "npx tsc"
   },
   "keywords": [],
   "author": "Danny Almeida",
@@ -26,7 +32,8 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
     "prettier": "^1.19.1",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.4",
+    "ts-node-dev": "^1.0.0-pre.44"
   },
   "dependencies": {
     "compression": "^1.7.4",
