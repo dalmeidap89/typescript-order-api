@@ -1,0 +1,55 @@
+{
+  "env": {
+    "commonjs": true,
+    "es6": true,
+    "node": true
+  },
+  "extends": ["airbnb-base", "prettier"],
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "tsconfigRootDir": "./",
+    "sourceType": "module" // Allows for the use of imports
+  },
+  "plugins": ["@typescript-eslint", "prettier"],
+  "rules": {
+    "prettier/prettier": "error",
+    "@typescript-eslint/no-use-before-define": "off", // Allows us to hoist variables and functions which I am a fan of, functions not variables that is.
+    "@typescript-eslint/no-explicit-any": "off", // Too strict for my case, sometimes I need an any type
+    "@typescript-eslint/member-delimiter-style": [
+      "error",
+      {
+        // Prevents us from using any delimiter for interface properties.
+        "multiline": {
+          "delimiter": "none",
+          "requireLast": false
+        },
+        "singleline": {
+          "delimiter": "comma",
+          "requireLast": false
+        }
+      }
+    ],
+    "@typescript-eslint/indent": "off", // This is the job of StandardJS, they are competing rules so we turn off the Typescript one.
+    // 0 = off, 1 = warn, 2 = error -> unused vars
+    "no-unused-vars": 2, // On the fence about using this one, sometimes we import a package that is never used directly.
+    "node/no-unsupported-features/es-syntax": "off", // Allows us to use Import and Export keywords.
+    "space-before-function-paren": 0,
+    "new-cap": 0,
+    "semi": ["error", "always"],
+    "camelcase": "error",
+    "comma-dangle": "off",
+    "indent": ["error", 2],
+    "prefer-const": [
+      "error",
+      {
+        "destructuring": "any",
+        "ignoreReadBeforeAssign": false
+      }
+    ]
+  }
+}
