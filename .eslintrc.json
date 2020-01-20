@@ -4,7 +4,14 @@
     "es6": true,
     "node": true
   },
-  "extends": ["airbnb-base", "prettier"],
+  "extends": [
+    "airbnb-base",
+    "prettier",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
+  ],
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
@@ -34,13 +41,23 @@
         }
       }
     ],
-    "@typescript-eslint/indent": "off", // This is the job of StandardJS, they are competing rules so we turn off the Typescript one.
-    // 0 = off, 1 = warn, 2 = error -> unused vars
-    "no-unused-vars": 2, // On the fence about using this one, sometimes we import a package that is never used directly.
+    "@typescript-eslint/explicit-function-return-type": [
+      0,
+      {
+        "allowExpressions": false
+      }
+    ],
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "error",
+    "no-useless-constructor": "off",
+    "@typescript-eslint/no-useless-constructor": "error",
+    "import/named": "off",
+    "import/export": "off",
+    "import/prefer-default-export": "off", // Allow single Named-export
     "node/no-unsupported-features/es-syntax": "off", // Allows us to use Import and Export keywords.
     "space-before-function-paren": 0,
     "new-cap": 0,
-    "semi": ["error", "always"],
+    "semi": ["error", "never"],
     "camelcase": "error",
     "comma-dangle": "off",
     "indent": ["error", 2],
@@ -50,6 +67,25 @@
         "destructuring": "any",
         "ignoreReadBeforeAssign": false
       }
-    ]
+    ],
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
+    "class-methods-use-this": 0,
+    "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }]
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
   }
 }
