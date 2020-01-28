@@ -79,7 +79,8 @@
       }
     ],
     "class-methods-use-this": 0,
-    "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }]
+    "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
+    "no-underscore-dangle": ["error", { "allow": ["_id"] }] /* Necesario para Mongoose */
   },
   "settings": {
     "import/resolver": {

@@ -1,59 +1,57 @@
 import { Response, Request } from 'express'
-import * as _ from 'lodash'
-import Order from '../models/order'
 import { OrderStatus } from '../models/orderStatus'
+import * as _ from 'lodash'
+import { OrderModel } from '../schemas/order.schema'
+import { formatOutput } from '../utils/response.format'
+import { UserModel } from '../schemas/user.schema'
 
-let orders: Array<Order> = []
+const LENGTH_DEFAULT = 10
 
-export const getOrder = (req: Request, res: Response) => {
+export const getOrder = async (req: Request, res: Response) => {
   const { id } = req.params
-  const order = orders.find(obj => obj.id === Number(id))
-  const httpStatusCode = order ? 200 : 404
-  return res.status(httpStatusCode).send(order)
-}
-
-export const getAllOrders = (req: Request, res: Response) => {
-  const limit = parseInt(req.params.limit, 10) || orders.length
-  const offset = parseInt(req.params.offset, 10) || 0
-
-  const ordersFilteres = _.chain(orders)
-    .drop(offset)
-    .take(limit)
-    .value()
-  return res.status(200).send(ordersFilteres)
-}
-
-export const addOrder = (req: Request, res: Response) => {
-  const order: Order = {
-    // generic random value from 1 to 100 only for tests so far
-    id: Math.floor(Math.random() * 100) + 1,
-    userId: req.body.userId,
-    quantity: req.body.quantity,
-    shipDate: req.body.shipDate,
-    status: OrderStatus.Placed,
-    complete: false,
-  }
-  orders.push(order)
-  return res.status(201).send(order)
-}
-
-export const removeOrder = (req: Request, res: Response) => {
-  const id = Number(req.params.id)
-  const orderIndex = orders.findIndex(item => item.id === id)
-  if (orderIndex === -1) {
+  const order = await OrderModel.findById(id)
+  if (!order) {
     return res.status(404).send()
   }
-  orders = orders.filter(item => item.id !== id)
+
+  return formatOutput(res, order, 200, 'order')
+}
+
+export const getAllOrders = async (req: Request, res: Response) => {
+  const limit = parseInt(req.params.limit, 10) || LENGTH_DEFAULT
+  const offset = parseInt(req.params.offset, 10) || 0
+
+  const orders = await OrderModel.find({}, null, { skip: offset, limit })
+  return formatOutput(res, orders, 200, 'order')
+}
+
+export const addOrder = async (req: Request, res: Response) => {
+  const { userId } = req.body
+  const user = await UserModel.findById(userId)
+  if (!user) {
+    return res.status(404).send()
+  }
+
+  const order = new OrderModel(req.body)
+  await order.save()
+
+  return formatOutput(res, order, 201, 'order')
+}
+
+export const removeOrder = async (req: Request, res: Response) => {
+  const id = Number(req.params.id)
+  const order = await OrderModel.findById(id)
+  if (!order) {
+    return res.status(404).send()
+  }
+  await order.remove()
   return res.status(204).send()
 }
 
-export const getInventory = (req: Request, res: Response) => {
+export const getInventory = async (req: Request, res: Response) => {
   const { status } = req.query
-  let inventoryOrders = orders
-  if (status) {
-    inventoryOrders = inventoryOrders.filter(order => order.status === status)
-  }
+  const orders = await OrderModel.find({ status })
+  const listOrders = _.groupBy(orders, 'userId')
 
-  const groupedOrders = _.groupBy(inventoryOrders, 'userId')
-  return res.status(200).send(groupedOrders)
+  return formatOutput(res, listOrders, 200, 'inventory')
 }
