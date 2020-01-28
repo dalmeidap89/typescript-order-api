@@ -1,8 +1,13 @@
 import { Response } from 'express'
-import { ApplicationType } from '../models/applicationType'
 import * as js2xmlparser from 'js2xmlparser'
+import { ApplicationType } from '../models/applicationType'
 
-export const formatOutput = (res: Response, data: any, statusCode: number, rootElement?: string) => {
+export const formatOutput = (
+  res: Response,
+  data: any,
+  statusCode: number,
+  rootElement?: string
+) => {
   return res.format({
     json: () => {
       res.type(ApplicationType.JSON)

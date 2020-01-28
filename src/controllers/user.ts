@@ -1,39 +1,56 @@
 import { Response, Request } from 'express'
-import { User } from '../models/user'
+import bcrypt from 'bcrypt'
+import { UserModel } from '../schemas/user.schema'
+import { formatOutput } from '../utils/response.format'
+import { OrderAPILogger } from '../utils/logger'
 
-let users: Array<User> = []
-
-export const getUser = (req: Request, res: Response) => {
+export const getUser = async (req: Request, res: Response) => {
   const { username } = req.params
-  const user = users.find(obj => obj.username === username)
-  const httpStatusCode = user ? 200 : 404
-  return res.status(httpStatusCode).send(user)
-}
 
-export const addUser = (req: Request, res: Response) => {
-  const user: User = {
-    // generic random value from 1 to 100 only for tests so far
-    id: Math.floor(Math.random() * 100) + 1,
-    username: req.body.username,
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    email: req.body.email,
-    password: req.body.password,
-    phone: req.body.phone,
-    userStatus: 1,
-  }
-
-  users.push(user)
-  return res.status(201).send(user)
-}
-
-export const updateUser = (req: Request, res: Response) => {
-  const { username } = req.params
-  const userIndex = users.findIndex(item => item.username === username)
-  if (userIndex === -1) {
+  OrderAPILogger.logger.info(`[GET] [/users] ${username}`)
+  let user = await UserModel.findOne({ username })
+  if (!user) {
+    OrderAPILogger.logger.info(
+      `[GET] [/users/:{username}] user with username ${username} not found`
+    )
     return res.status(404).send()
   }
-  const user = users[userIndex]
+
+  user = user.toJSON()
+  user._id = user._id.toString()
+
+  return formatOutput(res, user, 200, 'user')
+}
+
+export const addUser = async (req: Request, res: Response) => {
+  let newUser
+  try {
+    newUser = new UserModel(req.body)
+    OrderAPILogger.logger.info(`[POST] [/users] ${newUser}`)
+
+    newUser.password = bcrypt.hashSync(newUser.password, 10)
+    const user = await newUser.save()
+    return formatOutput(res, user, 201, 'user')
+  } catch (e) {
+    OrderAPILogger.logger.info(
+      `[POST] [/users] something went wrong when saving a new user ${newUser.username} | ${e.message}`
+    )
+    throw new Error(e)
+  }
+}
+
+export const updateUser = async (req: Request, res: Response) => {
+  const { username } = req.params
+  OrderAPILogger.logger.info(`[PATCH] [/users] ${username}`)
+
+  const user = await UserModel.findOne({ username })
+  if (!user) {
+    OrderAPILogger.logger.info(
+      `[PATCH] [/users/:{username}] user with username ${username} not found`
+    )
+    return res.status(404).send()
+  }
+
   user.username = req.body.username || user.username
   user.firstName = req.body.firstName || user.firstName
   user.lastName = req.body.lastName || user.lastName
@@ -41,17 +58,23 @@ export const updateUser = (req: Request, res: Response) => {
   user.password = req.body.password || user.password
   user.phone = req.body.phone || user.phone
   user.userStatus = req.body.userStatus || user.userStatus
-  users[userIndex] = user
-  // set Code only
+
+  await user.save()
   return res.status(204).send()
 }
 
-export const removeUser = (req: Request, res: Response) => {
+export const removeUser = async (req: Request, res: Response) => {
   const { username } = req.params
-  const userIndex = users.findIndex(item => item.username === username)
-  if (userIndex === -1) {
+  OrderAPILogger.logger.warn(`[DELETE] [/users] ${username}`)
+
+  const user = UserModel.findOne({ username })
+  if (!user) {
+    OrderAPILogger.logger.info(
+      `[DELETE] [/users/:{username}] user with username ${username} not found`
+    )
     return res.status(404).send()
   }
-  users = users.filter(item => item.username !== username)
+
+  await user.remove()
   return res.status(204).send()
 }

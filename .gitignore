@@ -8,3 +8,13 @@ npm-debug.log
 .idea
 .vscode
 coverage
+package-lock.json
+.stryker-tmp
+reports
+launch.json
+*.pem
+*.log
+keys.json
+gce.json
+*.env
+*.prod
