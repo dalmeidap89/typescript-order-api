@@ -49,7 +49,7 @@
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
     "@types/lodash": "^4.14.149",
-    "bcrypt": "^3.0.7",
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
